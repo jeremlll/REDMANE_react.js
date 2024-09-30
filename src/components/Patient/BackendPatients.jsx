@@ -21,7 +21,7 @@ import TablePagination from '@mui/material/TablePagination';
 import Title from '../../components/Dashboard/Title';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../actions/authActions';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -84,10 +84,12 @@ export default function AllPatients() {
   const [patients, setPatients] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { projectId } = useParams();
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const projectId = new URLSearchParams(location.search).get('project_id');
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -96,17 +98,25 @@ export default function AllPatients() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const url = projectId ? `http://localhost:8888/patients/?project_id=${projectId}` : 'http://localhost:8888/patients/';
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        setPatients([]); // Clear the previous patients
+
+        let url = 'http://115.146.84.144/patients/';
+        if (projectId) {
+          url += `?project_id=${projectId}`;
         }
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         setPatients(data);
       } catch (error) {
         console.error('Error fetching patients:', error);
       }
     };
+
     fetchPatients();
   }, [projectId]);
 
@@ -142,7 +152,7 @@ export default function AllPatients() {
             </Typography>
             <div style={{ display: 'flex', 
                           alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
+                          backgroundColor: 'rgba(255, 255, 255, 1)',
                           padding: '5px',
                           borderRadius: '5px',
                           alignSelf: 'center',
@@ -153,7 +163,7 @@ export default function AllPatients() {
             </div>
             <div style={{ display: 'flex', 
                           alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
+                          backgroundColor: 'rgba(255, 255, 255, 1)',
                           padding: '5px',
                           borderRadius: '5px',
                           alignSelf: 'center',
@@ -219,31 +229,30 @@ export default function AllPatients() {
                               color="primary"
                               size="small"
                               onClick={() => handleViewDetails(patient.id)}
-                              sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
-                            >
-                                View Details
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={patients.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                  />
-                </Paper>
+                              >
+                                View
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      rowsPerPageOptions={[10, 25, 50]}
+                      component="div"
+                      count={patients.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
-            <Footer />
-          </Container>
+              <Footer />
+            </Container>
+          </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
-  );
-}
+      </ThemeProvider>
+    );
+  }

@@ -99,7 +99,7 @@ export default function AllDatasets() {
   useEffect(() => {
     const fetchDatasets = async () => {
       try {
-        let url = 'http://localhost:8888/datasets/';
+        let url = 'http://115.146.84.144/datasets/';
         if (projectId) {
           url += `?project_id=${projectId}`;
         }
@@ -205,42 +205,50 @@ export default function AllDatasets() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {datasets.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((dataset) => (
-                        <TableRow key={dataset.id}>
-                          <TableCell>{dataset.id}</TableCell>
-                          <TableCell>{dataset.project_id}</TableCell>
-                          <TableCell>{dataset.name}</TableCell>
-                          <TableCell align="right">
-                               <Button
-                                 variant="contained"
-                                 color="primary"
-                                 size="small"
-                                 onClick={() => handleViewDetails(dataset.id)}
-                                 sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
-                               >
-                                 View Files
-                               </Button>
-                             </TableCell>
-                           </TableRow>
-                         ))}
-                       </TableBody>
-                     </Table>
-                     <TablePagination
-                       rowsPerPageOptions={[5, 10, 25]}
-                       component="div"
-                       count={datasets.length}
-                       rowsPerPage={rowsPerPage}
-                       page={page}
-                       onPageChange={handleChangePage}
-                       onRowsPerPageChange={handleChangeRowsPerPage}
-                     />
-                   </Paper>
-                 </Grid>
-               </Grid>
-               <Footer />
-             </Container>
-           </Box>
-         </Box>
-       </ThemeProvider>
+                      {datasets.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center">
+                            No datasets available.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        datasets.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((dataset) => (
+                          <TableRow key={dataset.id}>
+                            <TableCell>{dataset.id}</TableCell>
+                            <TableCell>{dataset.project_id}</TableCell>
+                            <TableCell>{dataset.name}</TableCell>
+                            <TableCell align="right">
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={() => handleViewDetails(dataset.id)}
+                                sx={{ textTransform: 'none' }}
+                                >
+                                  View
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={datasets.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </Paper>
+                </Grid>
+              </Grid>
+              <Footer />
+            </Container>
+          </Box>
+        </Box>
+      </ThemeProvider>
     );
-}
+  }
